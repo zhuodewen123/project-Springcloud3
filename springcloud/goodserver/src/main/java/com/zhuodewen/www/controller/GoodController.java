@@ -4,6 +4,8 @@ import com.zhuodewen.www.domain.Goods;
 import com.zhuodewen.www.service.GoodsService;
 import com.zhuodewen.www.util.JSONResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -19,6 +21,11 @@ public class GoodController {
     @Autowired
     private GoodsService goodsService;
 
+    /**
+     * Hibernate--新增商品(JPA)
+     * @param goods
+     * @return
+     */
     @RequestMapping(value = "save",method = RequestMethod.GET)
     @ResponseBody
     public JSONResult save(Goods goods){
@@ -33,6 +40,11 @@ public class GoodController {
         return js;
     }
 
+    /**
+     * Hibernate自定义HQL查询(根据商品名称查询商品)
+     * @param name
+     * @return
+     */
     @RequestMapping(value = "findName",method = RequestMethod.GET)
     @ResponseBody
     public JSONResult findName(String name){
@@ -48,6 +60,11 @@ public class GoodController {
         return js;
     }
 
+    /**
+     * Hibernate--自定义HQL查询(根据商品名称和编码查询商品)
+     * @param goods
+     * @return
+     */
     @RequestMapping(value = "findNameAndCode",method = RequestMethod.GET)
     @ResponseBody
     public JSONResult findNameAndCode(Goods goods){
@@ -63,6 +80,11 @@ public class GoodController {
         return js;
     }
 
+    /**
+     * Hibernate--自定义原生SQL查询(根据商品名称查询商品)
+     * @param name
+     * @return
+     */
     @RequestMapping(value = "findName2",method = RequestMethod.GET)
     @ResponseBody
     public JSONResult findName2(String name){
@@ -77,5 +99,95 @@ public class GoodController {
         }
         return js;
     }
+
+    // 分页查询
+    @RequestMapping(value = "findByGoodNamePageable",method = RequestMethod.GET)
+    @ResponseBody
+    public Page<Goods> findByGoodNamePageable(String name, Pageable pageable) {
+        return goodsService.findByGoodNamePageable(name, pageable);
+    }
+
+    /**
+     * 分页查询 + 动态条件(实现方式:Pageable)
+     */
+    @RequestMapping(value = "findPageIfGoodNameNotNull",method = RequestMethod.GET)
+    @ResponseBody
+    public Page<Goods> findPageIfGoodNameNotNull(String name, @PageableDefault(sort={"price","dicount"},direction=Sort.Direction.DESC)Pageable pageable) {
+        return goodsService.findPageIfGoodNameNotNull(name, pageable);
+    }
+
+    /**
+     * 分页查询 + 动态条件 + 原生SQL(实现方式:Pageable)
+     */
+    @RequestMapping(value = "findPageIfGoodNameNotNullNativeQuery",method = RequestMethod.GET)
+    @ResponseBody
+    public Page<Goods> findPageIfGoodNameNotNullNativeQuery(String name, Pageable pageable) {
+        return goodsService.findPageIfGoodNameNotNullNativeQuery(name,pageable);
+    }
+
+    /**
+     * Hibernate分页+高级查询(实现方式:Pageable+Example)
+     * @param goods         查询条件(对象中的字段)
+     * @return
+     */
+    @RequestMapping(value = "findPage",method = RequestMethod.GET)
+    @ResponseBody
+    public Page<Goods> findPage(Pageable pageable,Goods goods) {
+        Page<Goods> result=null;
+        try {
+            ExampleMatcher matcher = ExampleMatcher.matching()
+                    //过滤字段--全部模糊查询，即%{address}%
+                    .withMatcher("goodName", ExampleMatcher.GenericPropertyMatchers.contains())
+                    .withMatcher("goodCode", ExampleMatcher.GenericPropertyMatchers.contains())
+                    .withMatcher("title", ExampleMatcher.GenericPropertyMatchers.contains())
+                    //忽略字段，即不管password是什么值都不加入查询条件
+                    .withIgnorePaths("id").withIgnorePaths("price").withIgnorePaths("discount")
+                    .withIgnorePaths("context").withIgnorePaths("url").withIgnorePaths("picUrl");
+            Example<Goods> example = Example.of(goods, matcher);
+            result = goodsService.findAll(example, pageable);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    /**
+     * Hibernate分页+高级查询(实现方式:Pageable+Example)
+     * @param page
+     * @param size
+     * @param sortType
+     * @param sortFiled
+     * @param goods
+     * @return
+     */
+    @RequestMapping(value = "findPage2",method = RequestMethod.GET)
+    @ResponseBody
+    public Page<Goods> findPage2(int page,int size,String sortType,String sortFiled,Goods goods) {
+        Pageable pageable=null;
+        Page<Goods> result=null;
+        try {
+            if (sortType.equals("ASC")) {
+                //of(页码数,每页容量,排序方式,排序字段)
+                pageable = PageRequest.of(page, size, Sort.Direction.ASC, sortFiled);
+            } else {
+                //of(页码数,每页容量,排序方式,排序字段)
+                pageable = PageRequest.of(page, size, Sort.Direction.DESC, sortFiled);
+            }
+            ExampleMatcher matcher = ExampleMatcher.matching()
+                    //过滤字段--全部模糊查询，即%{address}%
+                    .withMatcher("goodName", ExampleMatcher.GenericPropertyMatchers.contains())
+                    .withMatcher("goodCode", ExampleMatcher.GenericPropertyMatchers.contains())
+                    .withMatcher("title", ExampleMatcher.GenericPropertyMatchers.contains())
+                    //忽略字段，即不管password是什么值都不加入查询条件
+                    .withIgnorePaths("id").withIgnorePaths("price").withIgnorePaths("discount")
+                    .withIgnorePaths("context").withIgnorePaths("url").withIgnorePaths("picUrl");
+            Example<Goods> example = Example.of(goods, matcher);
+            result = goodsService.findAll(example, pageable);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return result;
+    }
+
 
 }
