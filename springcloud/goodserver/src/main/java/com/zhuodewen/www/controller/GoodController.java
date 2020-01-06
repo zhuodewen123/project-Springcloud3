@@ -2,7 +2,11 @@ package com.zhuodewen.www.controller;
 
 import com.zhuodewen.www.domain.Goods;
 import com.zhuodewen.www.service.GoodsService;
+import com.zhuodewen.www.util.HibernateUtil;
 import com.zhuodewen.www.util.JSONResult;
+import org.hibernate.Session;
+import org.hibernate.query.NativeQuery;
+import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.data.web.PageableDefault;
@@ -10,6 +14,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.List;
 
 /**
  * 商品的controller
@@ -189,5 +195,120 @@ public class GoodController {
         return result;
     }
 
+
+
+
+    /**
+     * 测试Hibernate保存--代码方式
+     * @return
+     */
+    /*@RequestMapping(value = "testSaveByHQL",method = RequestMethod.GET)
+    @ResponseBody
+    public void testSaveByHQL(Goods goods) {
+        Session session = null;
+        try {
+            session= HibernateUtil.getSessionFactory().getCurrentSession();  //获取session
+            session.beginTransaction();                                     //开启事务(提交/回滚后自动关闭资源)
+            //session.saveOrUpdate(goods);
+            session.save(goods);
+            session.getTransaction().commit();                              //提交事务
+        }catch(Exception e){
+            e.printStackTrace();
+            session.getTransaction().rollback();                            //事务回滚
+        }
+    }*/
+
+    /**
+     * 测试Hibernate查询--代码方式
+     * @return
+     */
+    /*@RequestMapping(value = "testQueryByHQL",method = RequestMethod.GET)
+    @ResponseBody
+    public Page<Goods> testQueryByHQL(String goodName) {
+        Session session = null;
+        try {
+            session= HibernateUtil.getSessionFactory().getCurrentSession();  //获取session
+            session.beginTransaction();                                     //开启事务(提交/回滚后自动关闭资源)
+
+            String hql = "from Goods g where g.good_name = :goodName";
+            Query query = session.createQuery(hql);
+            query.setParameter("goodName", goodName);
+            List<Goods> list = query.list();
+            System.out.println(list.toString());
+
+            session.getTransaction().commit();                              //提交事务
+        }catch(Exception e){
+            e.printStackTrace();
+            session.getTransaction().rollback();                            //事务回滚
+        }
+        return null;
+    }*/
+
+    /**
+     *  测试Hibernate更新--代码方式
+     * @return
+     */
+    /*@RequestMapping(value = "testUpdateByHQL",method = RequestMethod.GET)
+    @ResponseBody
+    public void testUpdateByHQL(Integer id) {
+        Session session = null;
+        try {
+            session= HibernateUtil.getSessionFactory().getCurrentSession();  //获取session
+            session.beginTransaction();                                     //开启事务(提交/回滚后自动关闭资源)
+            String  hql="update Goods  set goodName='哈哈,被我改了吧' where id=:id";
+            Query query = session.createQuery(hql);
+            query.setParameter("id", id);
+            query.executeUpdate();
+            session.getTransaction().commit();                              //提交事务
+        }catch(Exception e){
+            e.printStackTrace();
+            session.getTransaction().rollback();                            //事务回滚
+        }
+    }*/
+
+    /**
+     * 测试Hibernate删除--代码方式
+     * @return
+     */
+    @RequestMapping(value = "testDeleteByHQL",method = RequestMethod.GET)
+    @ResponseBody
+    public void testDeleteByHQL(Integer id) {
+        Session session = null;
+        try {
+            session= HibernateUtil.getSessionFactory().getCurrentSession();  //获取session
+            session.beginTransaction();                                     //开启事务(提交/回滚后自动关闭资源)
+
+            String hql = "delete Goods where id=?";
+            session.createQuery(hql).setParameter(0, id).executeUpdate();
+
+            session.getTransaction().commit();                              //提交事务
+        }catch(Exception e){
+            e.printStackTrace();
+            session.getTransaction().rollback();                            //事务回滚
+        }
+    }
+
+    /**
+     * 测试Hibernate查询(原生SQL)--代码方式
+     */
+    /*@RequestMapping(value = "testSelectBySQL",method = RequestMethod.GET)
+    @ResponseBody
+    public Page<Goods> testSelectBySQL(String goodName) {
+        Session session = null;
+        try {
+            session=HibernateUtil.getSessionFactory().getCurrentSession();  //获取session
+            session.beginTransaction();                                     //开启事务(提交/回滚后自动关闭资源)
+
+            String sql = "select * from goods g where g.good_name= ? ";
+            NativeQuery query = session.createNativeQuery(sql).setParameter(0,goodName).addEntity(Goods.class);    //封装结果--转换为对象
+            List<Goods> list = query.list();
+
+            session.getTransaction().commit();                              //提交事务
+        }catch(Exception e){
+            e.printStackTrace();
+            session.getTransaction().rollback();                            //事务回滚
+        }
+        return null;
+    }*/
 
 }

@@ -43,10 +43,17 @@ public class Goods implements Serializable {
     //商品链接
     @Column(name = "url")
     private String url;
-
     //图片地址
     @Column(name = "pic_url")
     private String picUrl;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public String getGoodName() {
         return goodName;
@@ -111,4 +118,6 @@ public class Goods implements Serializable {
     public void setPicUrl(String picUrl) {
         this.picUrl = picUrl;
     }
+
+
 }
