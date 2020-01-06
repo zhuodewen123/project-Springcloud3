@@ -2,11 +2,7 @@ package com.zhuodewen.www.controller;
 
 import com.zhuodewen.www.domain.Goods;
 import com.zhuodewen.www.service.GoodsService;
-import com.zhuodewen.www.util.HibernateUtil;
 import com.zhuodewen.www.util.JSONResult;
-import org.hibernate.Session;
-import org.hibernate.query.NativeQuery;
-import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.data.web.PageableDefault;
@@ -15,10 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.List;
-
 /**
- * 商品的controller
+ * 商品的控制器
  */
 @Controller
 @RequestMapping("goods")
@@ -270,7 +264,7 @@ public class GoodController {
      * 测试Hibernate删除--代码方式
      * @return
      */
-    @RequestMapping(value = "testDeleteByHQL",method = RequestMethod.GET)
+    /*@RequestMapping(value = "testDeleteByHQL",method = RequestMethod.GET)
     @ResponseBody
     public void testDeleteByHQL(Integer id) {
         Session session = null;
@@ -286,7 +280,7 @@ public class GoodController {
             e.printStackTrace();
             session.getTransaction().rollback();                            //事务回滚
         }
-    }
+    }*/
 
     /**
      * 测试Hibernate查询(原生SQL)--代码方式
