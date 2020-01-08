@@ -22,7 +22,7 @@ public class GoodController {
     private GoodsService goodsService;
 
     /**
-     * Hibernate--新增商品(JPA)
+     * Hibernate--新增商品(JPA+注解)
      * @param goods
      * @return
      */
